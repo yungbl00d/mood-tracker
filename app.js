@@ -30,6 +30,10 @@ app.post('/api/mood', (req, res) => {
   });
 });
 
-//app.get('api/mood')
+app.get('/api/mood', (req, res) => {
+  Mood.find({}, (err, data) => {
+    res.json(data)
+  });
+});
 
 app.listen(port, () => console.log(`Example app listening on port ${port}!`))
