@@ -4,7 +4,9 @@ const userSchema = new Schema({
   username: String,
   password: String,
   moods: [String],
-  streak: Number
+  currentStreak: Number,
+  bestStreak: Number,
+  lastSubmittedDay: Number
 });
 userSchema.methods.validPassword = function(password){
   return this.password === password

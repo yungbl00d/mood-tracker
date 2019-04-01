@@ -70,19 +70,31 @@ app.get('/', (req, res) => res.sendFile(__dirname + "/views/index.html"))
 
 app.post('/mood', ensureAuthenticated, (req, res) => {
   User.findOne({username: req.user.username}, (err, data) => {
-    console.log(data);
+    //check Date
+    currDate = new Date(Date.now());
+    currDay = currDate.getUTCDay();
+    if(currDay == (data.lastSubmittedDay + 1) ||
+     (currDay == 0 && data.lastSubmittedDay == 6)){//consecutive day post
+       data.currentStreak++;
+       data.bestStreak = max(data.currentStreak, data.bestStreak);
+     }
+    else if (currDay != data.lastSubmittedDay){//user missed a day
+      data.currentStreak = 0;
+    }
+    //if neither if is triggered, user is posting on the same day
+    data.lastSubmittedDay = currDay;
     data.moods.push(req.body.mood);
     data.save((err) => {
       res.json(data);
-    })
+    });
 
   });
 });
 
 app.get('/mood', ensureAuthenticated,  (req, res) => {
   console.log(req.user)
-  User.find({username: req.user.username}, (err, data) => {
-    res.json({"moods": data[0].moods});
+  User.findOne({username: req.user.username}, (err, data) => {
+    res.json({"moods": data.moods});
   });
 });
 
@@ -101,10 +113,13 @@ app.post('/register', (req, res) => {
       console.log("user already created");
     }
     else{
+      var curr = new Date(Date.now())
       newUser = new User({
         username: req.body.username,
         password: req.body.password,
-        streak: 0
+        currentStreak: 0,
+        bestStreak: 0,
+        lastSubmittedDay: curr.getUTCDay()
       });
       newUser.save((err) => {
         res.send(newUser);
