@@ -71,41 +71,57 @@ app.get('/', (req, res) => res.sendFile(__dirname + "/views/index.html"))
 app.post('/mood', ensureAuthenticated, (req, res) => {
   User.findOne({username: req.user.username}, (err, data) => {
     console.log(data);
-    data.moods.append(req.body.mood);
+    data.moods.push(req.body.mood);
     data.save((err) => {
-      res.json(data.moods);
+      res.json(data);
     })
 
   });
 });
 
+app.get('/mood', ensureAuthenticated,  (req, res) => {
+  console.log(req.user)
+  User.find({username: req.user.username}, (err, data) => {
+    res.json({"moods": data[0].moods});
+  });
+});
 
+
+app.get('/register', (req, res) => {
+  res.sendFile(__dirname + "/views/register.html");
+});
 
 app.post('/register', (req, res) => {
-  newUser = new User({
-    username: req.body.username,
-    password: req.body.password,
-    streak: 0
+  User.findOne({username: req.body.username}, (err, data) => {
+    if(err) {
+      next(err)
+    }
+    else if (data) {
+      res.redirect('/');
+      console.log("user already created");
+    }
+    else{
+      newUser = new User({
+        username: req.body.username,
+        password: req.body.password,
+        streak: 0
+      });
+      newUser.save((err) => {
+        res.send(newUser);
+        console.log(newUser);
+      });
+    }
   });
-  newUser.save((err) => {
-    res.send(newUser);
-  });
+
 });
 
 app.post('/login',
   passport.authenticate('local', {session: true}),
   function(req, res) {
 
-    // If this function gets called, authentication was successful.
-    // `req.user` contains the authenticated user.
-    res.redirect('/mood');
+    res.sendFile(__dirname + "/views/profile.html")
   });
 
-app.get('/mood', ensureAuthenticated,  (req, res) => {
-  console.log(req.user)
-  User.find({username: req.user.username}, (err, data) => {
-    res.json({"mood": data.user.moods});
-  });
-});
+
 
 app.listen(port, () => console.log(`Mood app listening on port ${port}!`))
