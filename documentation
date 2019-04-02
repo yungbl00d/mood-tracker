@@ -1,0 +1,15 @@
+1. There are many, many changes I'd have made if this were a production application
+(and if I wasn't as busy). Most relate to security: I'd have hashed the passwords, instead of using plaintext,
+implemented security features from modules such as Helmet.js, and not rendered the entire
+user object when the user registers. Additionally, it would be easy to make a simple and intuitive
+front-end, and I would implement modularity in my server code by splitting it up into several
+functions (routing, config, etc.). The percentile rank functionality could also use some work:
+currently, the algorithm calculates it whenever the user "/GET"s the "/percentile" route, but this would be highly inefficient with
+a large-user base, and it would be more scalable to calculate the entire percentile curve every day or so.
+Also, visualizing the entire percentile-curve using D3 or a similar library would be simple to do and informative.
+2. Changing the type of the "mood" value would have very few implications for my back-end code, as I'd really only have
+to change the model schema in User.js and everything would maintain functionality. For previous users, though,
+with data in the legacy format there could be a few solutions. The simplest would be to save instances of all their data
+somewhere outside of the production database, and copy their accounts entirely except for "mood" values into the new
+system. If a simple translation function existed, e.g. between "positive" adjectives to respectively high integers and vice versa,
+then their "mood" values could also be copied into the new system as well.

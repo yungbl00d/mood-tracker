@@ -96,7 +96,8 @@ app.get('/mood', ensureAuthenticated,  (req, res) => {
   console.log(req.user)
 
   User.findOne({username: req.user.username}, (err, data) => {
-    res.json({"moods": data.moods});
+    res.json({"moods": data.moods,
+              "currentStreak": data.currentStreak});
   });
 
 });
@@ -132,7 +133,7 @@ app.post('/register', (req, res) => {
         username: req.body.username,
         password: req.body.password,
         currentStreak: 0,
-        bestStreak: req.body.bestStreak,
+        bestStreak: req.body.bestStreak || 0,
         lastSubmittedDay: curr.getUTCDay()
       });
       newUser.save((err) => {
