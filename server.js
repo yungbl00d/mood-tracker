@@ -5,6 +5,7 @@ const bodyParser = require('body-parser')
 var passport = require('passport')
   , LocalStrategy = require('passport-local').Strategy;
 var session = require('express-session')
+const MongoStore = require('connect-mongo')(session);
 var User = require('./models/User.js').user;
 
 const port = 3000
@@ -19,7 +20,7 @@ app.use(session({
   secret: "cats",
   resave: true,
   saveUninitialized: true,
-  store: "connect-mongo"
+  store: new MongoStore({mongooseConnection: mongoose.connection})
  }));
 app.use(passport.initialize());
 app.use(passport.session())
