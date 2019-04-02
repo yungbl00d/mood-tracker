@@ -76,7 +76,7 @@ app.post('/mood', ensureAuthenticated, (req, res) => {
     if(currDay == (data.lastSubmittedDay + 1) ||
      (currDay == 0 && data.lastSubmittedDay == 6)){//consecutive day post
        data.currentStreak++;
-       data.bestStreak = max(data.currentStreak, data.bestStreak);
+       data.bestStreak = Math.max(data.currentStreak, data.bestStreak);
      }
     else if (currDay != data.lastSubmittedDay){//user missed a day
       data.currentStreak = 0;
@@ -93,8 +93,21 @@ app.post('/mood', ensureAuthenticated, (req, res) => {
 
 app.get('/mood', ensureAuthenticated,  (req, res) => {
   console.log(req.user)
+
   User.findOne({username: req.user.username}, (err, data) => {
     res.json({"moods": data.moods});
+  });
+
+});
+
+app.get('/percentile', ensureAuthenticated, (req, res) => {
+  User.find({}, (err, data) => {
+    var total = data.length;
+    var percentIncrement = 100 / total;
+    var rank = 0;
+    for(var i = 0; i < total; i++){rank += req.user.bestStreak > data[i].bestStreak ? 1 : 0;}
+    //loop counts how many users the current one is ahead of
+    res.json({"percentile-rank": Math.floor(rank * percentIncrement)});
   });
 });
 
@@ -118,7 +131,7 @@ app.post('/register', (req, res) => {
         username: req.body.username,
         password: req.body.password,
         currentStreak: 0,
-        bestStreak: 0,
+        bestStreak: req.body.bestStreak,
         lastSubmittedDay: curr.getUTCDay()
       });
       newUser.save((err) => {
