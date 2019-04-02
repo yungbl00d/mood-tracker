@@ -18,7 +18,8 @@ mongoose.connect(process.env.MONGO_URI,  {useNewUrlParser: true}).catch( (e) => 
 app.use(session({
   secret: "cats",
   resave: true,
-  saveUninitialized: true
+  saveUninitialized: true,
+  store: "connect-mongo"
  }));
 app.use(passport.initialize());
 app.use(passport.session())
