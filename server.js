@@ -8,7 +8,6 @@ var session = require('express-session')
 const MongoStore = require('connect-mongo')(session);
 var User = require('./models/User.js').user;
 
-const port = 3000
 require('dotenv').config();
 mongoose.connect(process.env.MONGO_URI,  {useNewUrlParser: true}).catch( (e) => {
   console.log(e);
@@ -154,4 +153,4 @@ app.post('/login',
 
 
 
-app.listen(port, () => console.log(`Mood app listening on port ${port}!`))
+app.listen(process.env.port || 3000 /*() => console.log(`Mood app listening on port ${port}!`)*/);
